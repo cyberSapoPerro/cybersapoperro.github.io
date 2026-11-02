@@ -115,9 +115,27 @@ article {
 }
 
 /* Main navigation */
+
+/* Blog name */
+.site-brand {
+    color: #fabd2f;
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.site-brand:hover {
+    color: #fe8019;
+}
+
+/* Navigation links */
 .site-navigation {
     display: flex;
-    justify-content: center;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+
     margin: 1.5rem 0 2.5rem;
     padding: 0.5rem;
 
