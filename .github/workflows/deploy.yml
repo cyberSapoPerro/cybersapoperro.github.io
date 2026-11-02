@@ -1,0 +1,74 @@
+name: Deploy Tola site
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Download Tola
+        run: |
+          VERSION="0.8.1"
+          ARCHIVE="tola-${VERSION}-x86_64-unknown-linux-gnu.tar.gz"
+          URL="https://github.com/tola-rs/tola-ssg/releases/download/v${VERSION}/${ARCHIVE}"
+
+          curl -L "$URL" -o "$ARCHIVE"
+
+          echo "2445a659d49db47c1bed6387399ccffcef739a47ca64871898a376d2566ec260  $ARCHIVE" \
+            | sha256sum --check
+
+          mkdir -p "$RUNNER_TEMP/tola" "$RUNNER_TEMP/bin"
+
+          tar -xzf "$ARCHIVE" -C "$RUNNER_TEMP/tola"
+
+          BINARY=$(find "$RUNNER_TEMP/tola" -type f -name tola -print -quit)
+
+          if [ -z "$BINARY" ]; then
+            echo "Tola binary not found"
+            exit 1
+          fi
+
+          install -m 755 "$BINARY" "$RUNNER_TEMP/bin/tola"
+
+          echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
+
+      - name: Check Tola installation
+        run: tola --version
+
+      - name: Build website
+        run: tola build
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: public
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
