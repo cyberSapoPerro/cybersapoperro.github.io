@@ -10,7 +10,3 @@
 Bienvenido a mi blog personal.
 
 Aquí publico mis cosas.
-
-== Últimos artículos
-
-Próximamente encontrarás aquí mis últimas publicaciones.

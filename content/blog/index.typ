@@ -6,5 +6,3 @@
 ))
 
 = Blog
-
-Aquí encontrarás mis publicaciones.
